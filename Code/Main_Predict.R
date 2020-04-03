@@ -51,14 +51,14 @@ rm(indeks_test)
 
 % 7. Apply [S]ynthetic [M]inority [O]versampling [TE]chnique for Nominal and Numerical Feature(s)
 
-set.seed(10116070)
+set.seed(2020)
 % pick between HEOM and HVDM
 balanced_train = SmoteClassif(flag_kredit_macet~., train, C.perc="balance", dist="HEOM")
 
 
 % 8. Split Train Data into Learning Data and Validation Data
 
-set.seed(10116070)
+set.seed(2020)
 samp = sample(1:nrow(balanced_train), nrow(balanced_train)*0.7)
 learning = balanced_train[samp,]
 validation = balanced_train[-samp,]
@@ -66,7 +66,7 @@ validation = balanced_train[-samp,]
 
 % 9. Construct Logistic Regression Model
 
-set.seed(10116070)
+set.seed(2020)
 logmodel = glm(flag_kredit_macet~., learning, family = "binomial")
 prob_logpred = predict(logmodel,validation,type = "response")
 logpred = ifelse(prob_logpred > 0.5, "1", "0") 
@@ -76,7 +76,7 @@ F1_Score(y_pred = logpred, y_true = validation$flag_kredit_macet, positive = "1"
 
 % 10. Construct Support Vector Machine Model
 
-set.seed(10116070)
+set.seed(2020)
 svm_model <- svm(flag_kredit_macet ~ ., data=learning)
 #summary(svm_model)
 svm_pred <- predict(svm_model,validation)
@@ -86,7 +86,7 @@ F1_Score(y_pred = svm_pred, y_true = validation$flag_kredit_macet, positive = "1
 
 % 11. Construct Decision Tree Model
 
-set.seed(10116070)
+set.seed(2020)
 tree_model = rpart(flag_kredit_macet ~ ., data = learning, method = 'class')
 tree_pred = as.data.frame(predict(tree_model,validation))
 tree_pred = tree_pred %>%
@@ -98,7 +98,7 @@ F1_Score(y_pred = tree_pred, y_true = validation$flag_kredit_macet, positive = "
 
 % 12. Construct Nearest Neighbour Model
 
-set.seed(10116070)
+set.seed(2020)
 trCtrl = trainControl(method = "repeatedcv", number = 10, repeats = 3 )
 nnmodel = train(flag_kredit_macet~.,data=learning,method = 'knn',tuneLength = 20, trControl = trCtrl)
 nnpred = predict(nnmodel,validation)
@@ -108,7 +108,7 @@ F1_Score(y_pred = nnpred, y_true = validation$flag_kredit_macet, positive = "1")
 
 % 13. Predicting "Default" Feature on Test Data
 
-set.seed(10116070)
+set.seed(2020)
 test_prob_logpred = predict(logmodel,test,type = "response")
 test_logpred = ifelse(test_prob_logpred > 0.5, "1", "0") # ini yang digunakan
 
