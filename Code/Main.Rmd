@@ -1,0 +1,157 @@
+---
+title: "Latih1 - Credit Default Classification 2020"
+author: "F1_Score"
+date: "2/25/2020"
+output: html_document
+---
+
+1. Menyediakan Paket 
+```{r}
+library(caret)
+library(dplyr)
+library(e1071)
+library(MASS)
+library(MLmetrics)
+library(readr)
+library(rpart)
+library(UBL)
+```
+
+2. Membaca data
+```{r}
+train <- read.csv("train.csv")
+test <- read.csv("test.csv")
+```
+
+3. Menghapus Kolom ID Nasabah (atau kolom X) pada Train dan Test
+```{r}
+train$X = NULL
+test$X = NULL
+```
+
+4. Memeriksa Kolom yang Mengandung Missing Data pada Train dan Test
+```{r}
+train[,!complete.cases(train)]
+test[,!complete.cases(train)]
+```
+
+5. Mengubah Tipe Data untuk Beberapa Kolom pada Train dan Test
+```{r}
+train$jumlah_kartu = as.numeric(train$jumlah_kartu)
+train$outstanding = as.numeric(train$outstanding)
+train$skor_delikuensi = as.numeric(train$skor_delikuensi)
+train$flag_kredit_macet = as.factor(as.numeric(train$flag_kredit_macet))
+
+test$jumlah_kartu = as.numeric(test$jumlah_kartu)
+test$outstanding = as.numeric(test$outstanding)
+test$skor_delikuensi = as.numeric(test$skor_delikuensi)
+```
+
+6. Melakukan Standardisasi Kolom Numerik pada Train dan Test
+```{r}
+indeks_train <- sapply(train, is.numeric)
+train[indeks_train] <- lapply(train[indeks_train], scale)
+rm(indeks_train)
+
+indeks_test <- sapply(test, is.numeric)
+test[indeks_test] <- lapply(test[indeks_test], scale)
+rm(indeks_test)
+```
+
+7. Menerapkan [S]ynthetic [M]inority [O]versampling [TE]chnique Khusus untuk Prediktor Nominal(kategorikal) dan Numerikal
+```{r}
+set.seed(10116070)
+# Distribusi yang dapat dipilih hanya ada dua: HEOM atau HVDM
+balanced_train = SmoteClassif(flag_kredit_macet~., train, C.perc="balance", dist="HEOM")
+```
+
+8. Membagi Data Train menjadi Learning Set dan Validation Set
+```{r}
+set.seed(10116070)
+samp = sample(1:nrow(balanced_train), nrow(balanced_train)*0.7)
+learning = balanced_train[samp,]
+validation = balanced_train[-samp,]
+```
+
+9. Membangun Model Logistic Regression
+```{r}
+set.seed(10116070)
+logmodel = glm(flag_kredit_macet~., learning, family = "binomial")
+prob_logpred = predict(logmodel,validation,type = "response")
+logpred = ifelse(prob_logpred > 0.5, "1", "0") 
+table(logpred,validation$flag_kredit_macet)
+F1_Score(y_pred = logpred, y_true = validation$flag_kredit_macet, positive = "1")
+```
+
+10. Membangun Model Support Vector Machine
+```{r}
+set.seed(10116070)
+svm_model <- svm(flag_kredit_macet ~ ., data=learning)
+#summary(svm_model)
+svm_pred <- predict(svm_model,validation)
+table(svm_pred,validation$flag_kredit_macet)
+F1_Score(y_pred = svm_pred, y_true = validation$flag_kredit_macet, positive = "1")
+```
+
+11. Membangun Model Decision Tree
+```{r}
+set.seed(10116070)
+tree_model = rpart(flag_kredit_macet ~ ., data = learning, method = 'class')
+tree_pred = as.data.frame(predict(tree_model,validation))
+tree_pred = tree_pred %>%
+            mutate(decision = ifelse( tree_pred$`0` < tree_pred$`1` , 1, 0))
+tree_pred = tree_pred$decision 
+table(tree_pred,validation$flag_kredit_macet)
+F1_Score(y_pred = tree_pred, y_true = validation$flag_kredit_macet, positive = "1")
+```
+
+12. Membangun Model Nearest Neighbour
+```{r}
+set.seed(10116070)
+trCtrl = trainControl(method = "repeatedcv", number = 10, repeats = 3 )
+nnmodel = train(flag_kredit_macet~.,data=learning,method = 'knn',tuneLength = 20, trControl = trCtrl)
+nnpred = predict(nnmodel,validation)
+table(nnpred,validation$flag_kredit_macet)
+F1_Score(y_pred = nnpred, y_true = validation$flag_kredit_macet, positive = "1")
+```
+
+13. Melakukan Prediksi terhadap Data Test dan Menulis Hasil Prediksi dalam CSV
+```{r}
+set.seed(10116070)
+test_prob_logpred = predict(logmodel,test,type = "response")
+test_logpred = ifelse(test_prob_logpred > 0.5, "1", "0") # ini yang digunakan
+
+test_svm_pred <- predict(svm_model,test) # ini yang digunakan
+
+test_tree_pred = as.data.frame(predict(tree_model,test))
+test_tree_pred = test_tree_pred %>%
+            mutate(decision = ifelse( test_tree_pred$`0` < test_tree_pred$`1` , 1, 0))
+test_tree_pred = test_tree_pred$decision # ini yang digunakan
+
+test_nnpred = predict(nnmodel,test)
+#write_csv(x = test_logpred, path ="logistic.csv" )
+#write_csv(x = test_svm_pred,  path ="svm.csv")
+#write_csv(x = test_tree_pred,  path ="decisiontree.csv")
+```
+
+14. Memilih Model Terbaik dengan Meninjau Proporsi Prediksi (Terbaik = Tidak Timpang)
+```{r}
+table(test_logpred)
+```
+```{r}
+table(test_svm_pred)
+```
+```{r}
+table(test_tree_pred)
+```
+```{r}
+table(test_nnpred)
+```
+
+
+Opsional. Membersihkan Semua Variabel beserta Console
+```{r}
+rm(list=ls())
+cat("\014")  
+```
+
