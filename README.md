@@ -4,6 +4,6 @@ This Repo contains files (and also code) for predicting credit default status. T
 
 Disclaimer: 
 
-- the data is taken from Finhacks 2018 competition then adopted in kaggle web here: https://www.kaggle.com/c/bankbirubutuhkamu
+- The data is taken from Finhacks 2018 competition then adopted in kaggle web here: https://www.kaggle.com/c/bankbirubutuhkamu
 
-- use the latest version of R and RStudio 
+- Use the latest version of R and RStudio 
