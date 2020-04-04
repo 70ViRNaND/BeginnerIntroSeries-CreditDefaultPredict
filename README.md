@@ -6,4 +6,4 @@ Disclaimer:
 
 - the data is taken from Finhacks 2018 competition then adopted in kaggle web here: https://www.kaggle.com/c/bankbirubutuhkamu
 
--use the latest version of R and RStudio 
+- use the latest version of R and RStudio 
