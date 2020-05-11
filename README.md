@@ -7,3 +7,7 @@ Disclaimer:
 - The data is taken from Finhacks 2018 competition then hosted in kaggle web here: https://www.kaggle.com/c/bankbirubutuhkamu/data
 
 - Use the latest version of R and RStudio 
+
+TODO : 
+  
+  - Release digestable tutorial (SMOTE-like sampling method included) 
