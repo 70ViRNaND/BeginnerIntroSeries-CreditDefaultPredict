@@ -1,5 +1,5 @@
 # Basic Credit Default Prediction with R 
-This Repo contains files (and also code) for predicting credit default status. 
+This Repo contains files (and also code) for Basic Credit Default Prediction. 
 
 
 Disclaimer: 
