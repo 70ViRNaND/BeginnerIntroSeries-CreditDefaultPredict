@@ -10,6 +10,6 @@ Disclaimer:
 
 TODO : 
   
-  - Upload digestable tutorial in PDF format (SMOTE-like sampling method included)
+  - Upload digestable tutorial in PDF and MP4 format (SMOTE-like sampling method included)
   
-  - Upload digestable tutorial in MP4 format (SMOTE-like sampling method included)
+  
