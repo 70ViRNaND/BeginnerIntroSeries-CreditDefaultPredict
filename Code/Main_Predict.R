@@ -122,7 +122,7 @@ test_tree_pred = test_tree_pred$decision # ini yang digunakan
 test_nnpred = predict(nnmodel,test)
 
 
-% 14. Best Model Selection (Best means almost balanced proportions)
+% 14. Best Model Selection (Best model, logically, means model with highest F1_Score)
 
 table(test_logpred)
 
