@@ -11,6 +11,6 @@ This task is important because it is tedious for a bank to supervise every singl
 
 ### TODO  
 
-Upload short tutorial in the future... when time permits
+Upload short tutorial in the future when time permits.
   
   
